@@ -1,5 +1,5 @@
 class FilterpaneGrailsPlugin {
-    def version = "2.2.2"
+    def version = "2.2.2.1"
     def grailsVersion = "1.3 > *"
 
     def author = "Grails Plugin Consortium"
@@ -11,7 +11,8 @@ class FilterpaneGrailsPlugin {
     def developers = [
         [name: "Steve Krenek", email: "zeddmaxim@gmail.com"],
         [name: "Christian Oestreich", email: "acetrike@gmail.com"],
-        [name: "Jonas Stenberg", email: "jonas.stenberg@21grams.com"]]
+        [name: "Jonas Stenberg", email: "jonas.stenberg@21grams.com"],
+        [name: "Manuel Geier", email: "manuel.geier@gmail.com"]]
 
     def license = 'APACHE'
 

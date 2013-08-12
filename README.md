@@ -8,3 +8,8 @@ Filterpane Plugin
 ####Documentation Found Here####
 
 [Documentation](http://grails-plugin-consortium.github.io/grails-filterpane/)
+
+#### Fork ####
+by @mangei
+
+ - added possibility to add additional criterias to the filter

@@ -12,8 +12,16 @@ class FilterPaneService {
         doFilter(params, filterClass, false)
     }
 
+    def filter(params, Class filterClass, Closure additionalCriteria) {
+        doFilter(params, filterClass, false, additionalCriteria)
+    }
+
     def count(params, Class filterClass) {
         doFilter(params, filterClass, true)
+    }
+
+    def count(params, Class filterClass, Closure additionalCriteria) {
+        doFilter(params, filterClass, true, additionalCriteria)
     }
 
     private filterParse(criteria, domainClass, params, filterParams, filterOpParams, doCount) {
@@ -58,7 +66,10 @@ class FilterPaneService {
                     }
                 } else {
                     def thisDomainProp = FilterPaneUtils.resolveDomainProperty(domainClass, propName)
-                    def val = parseValue(thisDomainProp, rawValue, filterParams, null)
+                    def val = rawValue
+                    if(!(rawValue instanceof List)) {
+                        val = parseValue(thisDomainProp, rawValue, filterParams, null)
+                    }
                     def val2 = parseValue(thisDomainProp, rawValue2, filterParams, "${propName}To")
                     log.debug("== propName is ${propName}, rawValue is ${rawValue}, val is ${val} of type ${val?.class} val2 is ${val2} of type ${val2?.class}")
                     addCriterion(criteria, propName, filterOp, val, val2, filterParams, thisDomainProp)
@@ -84,6 +95,10 @@ class FilterPaneService {
     }
 
     private doFilter(params, Class filterClass, Boolean doCount) {
+        doFilter(params, filterClass, doCount, null)
+    }
+
+    private doFilter(params, Class filterClass, Boolean doCount, Closure additionalAddCriteria) {
         log.debug("filtering... params = ${params.toMapString()}")
         //def filterProperties = params?.filterProperties?.tokenize(',')
         def filterParams = params.filter ? params.filter : params
@@ -99,6 +114,10 @@ class FilterPaneService {
             def criteriaClosure = {
                 and {
                     filterParse(c, domainClass, params, filterParams, filterOpParams, doCount)
+                }
+
+                if(additionalAddCriteria) {
+                    additionalAddCriteria(c)
                 }
 
                 if(doCount) {
@@ -117,7 +136,7 @@ class FilterPaneService {
                         maxResults(params.max.toInteger())
                     }
                     if(params.fetchMode) {
-                        def fetchModes
+                        def fetchModes = null
                         if(params.fetchMode instanceof Map) {
                             fetchModes = params.fetchModes
                         }
@@ -128,9 +147,9 @@ class FilterPaneService {
                             }
                         }
                     }
-                    def defaultSort
+                    def defaultSort = null
                     try {
-                        defaultSort = new GrailsDomainBinder().getMapping(filterClass)?.sort
+                        defaultSort = GrailsDomainBinder.getMapping(filterClass)?.sort
                     } catch(Exception ex) {
                         log.info ex
                         log.info("No mapping property found on filterClass ${filterClass}")
